@@ -3,6 +3,7 @@ package com.assembleia.app.votacao.controller;
 import com.assembleia.app.votacao.dto.request.PautaRequest;
 import com.assembleia.app.votacao.dto.response.PautaResponse;
 import com.assembleia.app.votacao.service.PautaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +18,7 @@ public class PautaController {
     private final PautaService pautaService;
 
     @PostMapping
-    public ResponseEntity<PautaResponse> criar(@RequestBody PautaRequest pautaRequest) {
+    public ResponseEntity<PautaResponse> criar(@RequestBody @Valid PautaRequest pautaRequest) {
         return ResponseEntity.ok(pautaService.salvar(pautaRequest));
     }
 }

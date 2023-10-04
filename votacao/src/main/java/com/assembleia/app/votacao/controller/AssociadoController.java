@@ -3,6 +3,7 @@ package com.assembleia.app.votacao.controller;
 import com.assembleia.app.votacao.dto.request.AssociadoRequest;
 import com.assembleia.app.votacao.dto.response.AssociadoResponse;
 import com.assembleia.app.votacao.service.AssociadoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class AssociadoController {
     }
 
     @PostMapping
-    public ResponseEntity<AssociadoResponse> criar(@RequestBody AssociadoRequest request) {
+    public ResponseEntity<AssociadoResponse> criar(@RequestBody @Valid AssociadoRequest request) {
         return ResponseEntity.ok(associadoService.salvar(request));
     }
 }
