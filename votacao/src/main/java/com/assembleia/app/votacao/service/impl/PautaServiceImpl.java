@@ -3,6 +3,7 @@ package com.assembleia.app.votacao.service.impl;
 import com.assembleia.app.votacao.dto.request.PautaRequest;
 import com.assembleia.app.votacao.dto.response.PautaResponse;
 import com.assembleia.app.votacao.exception.NotFoundException;
+import com.assembleia.app.votacao.exception.UnprocessableEntityException;
 import com.assembleia.app.votacao.mapper.PautaMapper;
 import com.assembleia.app.votacao.model.Associado;
 import com.assembleia.app.votacao.model.Pauta;
@@ -28,5 +29,11 @@ public class PautaServiceImpl implements PautaService {
         pauta.setRelator(associado);
 
         return pautaMapper.modelToResponse(pautaRepository.save(pauta));
+    }
+
+    @Override
+    public Pauta validaPorId(Long id) {
+        return pautaRepository.findById(id)
+                .orElseThrow(() -> new UnprocessableEntityException("Pauta não encontrada."));
     }
 }
