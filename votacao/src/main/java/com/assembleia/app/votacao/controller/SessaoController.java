@@ -20,9 +20,9 @@ public class SessaoController {
 
     @PostMapping
     public ResponseEntity<SessaoResponse> criar(@RequestBody @Valid SessaoRequest request, UriComponentsBuilder uriBuilder) {
-        SessaoResponse sessaoSalva = sessaoService.salvar(request);
+        SessaoResponse sessaoRegistrada = sessaoService.salvar(request);
         return ResponseEntity.created(
-                uriBuilder.path("/v1/sessoes/{id}").buildAndExpand(sessaoSalva.id()).toUri()
-        ).body(sessaoSalva);
+                uriBuilder.path("/v1/sessoes/{id}").buildAndExpand(sessaoRegistrada.id()).toUri()
+        ).body(sessaoRegistrada);
     }
 }

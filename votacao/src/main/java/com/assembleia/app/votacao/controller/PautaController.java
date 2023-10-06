@@ -10,15 +10,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/pauta")
+@RequestMapping("/v1/pautas")
 public class PautaController {
     private final PautaService pautaService;
 
     @PostMapping
-    public ResponseEntity<PautaResponse> criar(@RequestBody @Valid PautaRequest pautaRequest) {
-        return ResponseEntity.ok(pautaService.salvar(pautaRequest));
+    public ResponseEntity<PautaResponse> criar(@RequestBody @Valid PautaRequest pautaRequest, UriComponentsBuilder uriBuilder) {
+        PautaResponse pautaRegistrada = pautaService.salvar(pautaRequest);
+        return ResponseEntity.created(
+                uriBuilder.path("/v1/pautas/{id}").buildAndExpand(pautaRegistrada.id()).toUri()
+        ).body(pautaRegistrada);
     }
 }

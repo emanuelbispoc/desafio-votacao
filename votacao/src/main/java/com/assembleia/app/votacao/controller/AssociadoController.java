@@ -7,10 +7,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/associado")
+@RequestMapping("/v1/associados")
 public class AssociadoController {
     private final AssociadoService associadoService;
 
@@ -20,7 +21,10 @@ public class AssociadoController {
     }
 
     @PostMapping
-    public ResponseEntity<AssociadoResponse> criar(@RequestBody @Valid AssociadoRequest request) {
-        return ResponseEntity.ok(associadoService.salvar(request));
+    public ResponseEntity<AssociadoResponse> criar(@RequestBody @Valid AssociadoRequest request, UriComponentsBuilder uriBuilder) {
+        AssociadoResponse associadoRegistrado = associadoService.salvar(request);
+        return ResponseEntity.created(
+                uriBuilder.path("/v1/associados/{id}").buildAndExpand(associadoRegistrado.id()).toUri()
+        ).body(associadoRegistrado);
     }
 }
