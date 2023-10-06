@@ -1,7 +1,7 @@
 CREATE TABLE sessoes (
     id SERIAL PRIMARY KEY,
-    data_inicio DATETIME NOT NULL,
-    data_fim DATETIME NOT NULL,
+    data_inicio TIMESTAMP NOT NULL,
+    data_fim TIMESTAMP NOT NULL,
     pauta_id BIGINT NOT NULL,
 
     FOREIGN KEY (pauta_id) REFERENCES pautas (id)
