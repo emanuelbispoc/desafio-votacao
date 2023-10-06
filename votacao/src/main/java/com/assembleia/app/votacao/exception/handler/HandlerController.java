@@ -1,5 +1,6 @@
 package com.assembleia.app.votacao.exception.handler;
 
+import com.assembleia.app.votacao.exception.DadoDuplicadoException;
 import com.assembleia.app.votacao.exception.NotFoundException;
 import com.assembleia.app.votacao.exception.UnprocessableEntityException;
 import org.springframework.http.HttpStatus;
@@ -18,5 +19,10 @@ public class HandlerController extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UnprocessableEntityException.class)
     public ResponseEntity<ErroResponse> handlerUnprocessableEntityException(UnprocessableEntityException exception){
         return new ResponseEntity<>(new ErroResponse(exception.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(DadoDuplicadoException.class)
+    public ResponseEntity<ErroResponse> handlerDadoDuplicadoException(DadoDuplicadoException exception){
+        return new ResponseEntity<>(new ErroResponse(exception.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
