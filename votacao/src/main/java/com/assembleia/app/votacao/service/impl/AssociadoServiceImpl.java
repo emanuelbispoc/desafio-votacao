@@ -27,12 +27,12 @@ public class AssociadoServiceImpl implements AssociadoService {
 
     @Override
     public AssociadoResponse salvar(AssociadoRequest associadoRequest) {
-        validarSeExistePorCpf(associadoRequest.cpf());
+        validarSeJaExistePorCpf(associadoRequest.cpf());
         Associado associado = associadoMapper.requestToModel(associadoRequest);
         return associadoMapper.modelToResponse(associadoRepository.save(associado));
     }
 
-    private void validarSeExistePorCpf(String cpf) {
+    private void validarSeJaExistePorCpf(String cpf) {
         if (associadoRepository.existsByCpf(cpf))
             throw new DadoDuplicadoException("CPF informado já cadastrado.");
     }
