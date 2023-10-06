@@ -2,6 +2,7 @@ package com.assembleia.app.votacao.service.impl;
 
 import com.assembleia.app.votacao.dto.request.AssociadoRequest;
 import com.assembleia.app.votacao.dto.response.AssociadoResponse;
+import com.assembleia.app.votacao.exception.DadoDuplicadoException;
 import com.assembleia.app.votacao.exception.NotFoundException;
 import com.assembleia.app.votacao.mapper.AssociadoMapper;
 import com.assembleia.app.votacao.model.Associado;
@@ -26,7 +27,13 @@ public class AssociadoServiceImpl implements AssociadoService {
 
     @Override
     public AssociadoResponse salvar(AssociadoRequest associadoRequest) {
+        validarSeExistePorCpf(associadoRequest.cpf());
         Associado associado = associadoMapper.requestToModel(associadoRequest);
         return associadoMapper.modelToResponse(associadoRepository.save(associado));
+    }
+
+    private void validarSeExistePorCpf(String cpf) {
+        if (associadoRepository.existsByCpf(cpf))
+            throw new DadoDuplicadoException("CPF informado já cadastrado.");
     }
 }
