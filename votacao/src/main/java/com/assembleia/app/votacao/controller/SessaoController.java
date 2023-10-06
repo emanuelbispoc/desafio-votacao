@@ -3,6 +3,7 @@ package com.assembleia.app.votacao.controller;
 import com.assembleia.app.votacao.dto.request.SessaoRequest;
 import com.assembleia.app.votacao.dto.response.SessaoResponse;
 import com.assembleia.app.votacao.service.SessaoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ public class SessaoController {
     private final SessaoService sessaoService;
 
     @PostMapping
-    public ResponseEntity<SessaoResponse> criar(@RequestBody SessaoRequest request, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<SessaoResponse> criar(@RequestBody @Valid SessaoRequest request, UriComponentsBuilder uriBuilder) {
         SessaoResponse sessaoSalva = sessaoService.salvar(request);
         return ResponseEntity.created(
                 uriBuilder.path("/v1/sessoes/{id}").buildAndExpand(sessaoSalva.id()).toUri()
