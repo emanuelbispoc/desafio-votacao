@@ -25,7 +25,7 @@ public class Sessao {
 
     private LocalDateTime dataFim;
 
-    @OneToMany(mappedBy = "id.sessao")
+    @OneToMany(mappedBy = "id.sessao", cascade = CascadeType.ALL)
     private List<VotoSessao> votos = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -46,12 +46,25 @@ public class Sessao {
         return status;
     }
 
-    public void atualizarStatus() {
+    public void adicionaVoto(VotoSessao voto) {
+        voto.setSessao(this);
+        votos.add(voto);
+    }
+
+    public long obterTotalVotosSim() {
+        return votos.stream().filter(voto -> voto.getDecisao() == Voto.SIM).count();
+    }
+
+    public long obterTotalVotosNao() {
+        return votos.stream().filter(voto -> voto.getDecisao() == Voto.NAO).count();
+    }
+
+    private void atualizarStatus() {
         if(dataFim.isAfter(LocalDateTime.now())) {
             status = SessaoStatus.EM_ANDAMENTO;
         }else {
-            long votosSim = votos.stream().filter(voto -> voto.getDecisao() == Voto.SIM).count();
-            long votosNao = votos.stream().filter(voto -> voto.getDecisao() == Voto.NAO).count();
+            long votosSim = obterTotalVotosSim();
+            long votosNao = obterTotalVotosNao();
 
             SessaoStatus votosVencedores = votosSim > votosNao ? SessaoStatus.PAUTA_APROVADA : SessaoStatus.PAUTA_REPROVADA;
             status = votosSim == votosNao ? SessaoStatus.EMPATE : votosVencedores;
