@@ -5,7 +5,6 @@ import com.assembleia.app.votacao.dto.request.VotoRequest;
 import com.assembleia.app.votacao.dto.response.SessaoResponse;
 import com.assembleia.app.votacao.dto.response.VotoSessaoResponse;
 import com.assembleia.app.votacao.enums.SessaoStatus;
-import com.assembleia.app.votacao.enums.Voto;
 import com.assembleia.app.votacao.exception.NotFoundException;
 import com.assembleia.app.votacao.exception.UnprocessableEntityException;
 import com.assembleia.app.votacao.mapper.SessaoMapper;
