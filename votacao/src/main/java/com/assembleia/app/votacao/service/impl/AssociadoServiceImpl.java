@@ -4,6 +4,7 @@ import com.assembleia.app.votacao.dto.request.AssociadoRequest;
 import com.assembleia.app.votacao.dto.response.AssociadoResponse;
 import com.assembleia.app.votacao.exception.DadoDuplicadoException;
 import com.assembleia.app.votacao.exception.NotFoundException;
+import com.assembleia.app.votacao.exception.UnprocessableEntityException;
 import com.assembleia.app.votacao.mapper.AssociadoMapper;
 import com.assembleia.app.votacao.model.Associado;
 import com.assembleia.app.votacao.repository.AssociadoRepository;
@@ -23,6 +24,12 @@ public class AssociadoServiceImpl implements AssociadoService {
                 .orElseThrow(() -> new NotFoundException("Associado não encontrado."));
 
         return associadoMapper.modelToResponse(associado);
+    }
+
+    @Override
+    public Associado buscarPorCpf(String cpf) {
+        return associadoRepository.findByCpf(cpf)
+                .orElseThrow(() -> new UnprocessableEntityException("Associado não encontrado."));
     }
 
     @Override
