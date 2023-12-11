@@ -31,6 +31,10 @@ public class Sessao {
     @Enumerated(EnumType.STRING)
     private transient SessaoStatus status;
 
+    private transient long votosSim;
+
+    private transient long votosNao;
+
     @OneToOne
     @JoinColumn(name = "pauta_id")
     private Pauta pauta;
@@ -46,16 +50,24 @@ public class Sessao {
         return status;
     }
 
+    public long getVotosSim() {
+        return obterTotalVotosSim();
+    }
+
+    public long getVotosNao() {
+        return obterTotalVotosNao();
+    }
+
     public void adicionaVoto(VotoSessao voto) {
         voto.setSessao(this);
         votos.add(voto);
     }
 
-    public long obterTotalVotosSim() {
+    private long obterTotalVotosSim() {
         return votos.stream().filter(voto -> voto.getDecisao() == Voto.SIM).count();
     }
 
-    public long obterTotalVotosNao() {
+    private long obterTotalVotosNao() {
         return votos.stream().filter(voto -> voto.getDecisao() == Voto.NAO).count();
     }
 
