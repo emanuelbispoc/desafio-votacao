@@ -2,6 +2,7 @@ package com.assembleia.app.votacao.service.impl;
 
 import com.assembleia.app.votacao.dto.request.SessaoRequest;
 import com.assembleia.app.votacao.dto.request.VotoRequest;
+import com.assembleia.app.votacao.dto.response.SessaoCriadaResponse;
 import com.assembleia.app.votacao.dto.response.SessaoResponse;
 import com.assembleia.app.votacao.dto.response.VotoSessaoResponse;
 import com.assembleia.app.votacao.enums.SessaoStatus;
@@ -32,13 +33,12 @@ public class SessaoServiceImpl implements SessaoService {
     private final SessaoMapper mapper;
 
     @Override
-    public Sessao buscarPorId(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Sessão não encontrada."));
+    public SessaoResponse buscarPorId(Long id) {
+        return mapper.modelToSimpleResponse(verificaSeExistePorId(id));
     }
 
     @Override
-    public SessaoResponse salvar(SessaoRequest request) {
+    public SessaoCriadaResponse salvar(SessaoRequest request) {
         Pauta pautaEncontrada = pautaService.validaPorId(request.pautaId());
 
         LocalDateTime dataAtual = LocalDateTime.now();
@@ -58,14 +58,19 @@ public class SessaoServiceImpl implements SessaoService {
         Sessao sessaoAtualizada = repository.save(sessao);
         return new VotoSessaoResponse(
                 sessaoAtualizada.getId(),
-                sessaoAtualizada.obterTotalVotosSim(),
-                sessaoAtualizada.obterTotalVotosNao(),
+                sessaoAtualizada.getVotosSim(),
+                sessaoAtualizada.getVotosNao(),
                 sessaoAtualizada.getDataFim()
         );
     }
 
+    private Sessao verificaSeExistePorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Sessão não encontrada."));
+    }
+
     private Sessao verificaSeSessaoPodeReceberVotos(Long sessaoId, Long associadoId) {
-        Sessao sessao = buscarPorId(sessaoId);
+        Sessao sessao = verificaSeExistePorId(sessaoId);
 
         if(sessao.getStatus() != SessaoStatus.EM_ANDAMENTO) {
             throw new UnprocessableEntityException("Sessão não está em andamento.");

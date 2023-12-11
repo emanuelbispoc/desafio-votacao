@@ -1,14 +1,15 @@
 package com.assembleia.app.votacao.dto.response;
 
-import com.assembleia.app.votacao.model.VotoSessao;
+import com.assembleia.app.votacao.enums.SessaoStatus;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-public record SessaoResponse(
+public record SessaoResponse (
         Long id,
         LocalDateTime dataInicio,
         LocalDateTime dataFim,
-        List<VotoSessao> votos,
-        PautaResponse pauta
+        long votosSim,
+        long votosNao,
+        PautaResponse pauta,
+        SessaoStatus status
 ) {}

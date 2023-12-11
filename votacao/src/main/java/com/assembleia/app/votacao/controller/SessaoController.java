@@ -2,6 +2,7 @@ package com.assembleia.app.votacao.controller;
 
 import com.assembleia.app.votacao.dto.request.SessaoRequest;
 import com.assembleia.app.votacao.dto.request.VotoRequest;
+import com.assembleia.app.votacao.dto.response.SessaoCriadaResponse;
 import com.assembleia.app.votacao.dto.response.SessaoResponse;
 import com.assembleia.app.votacao.dto.response.VotoSessaoResponse;
 import com.assembleia.app.votacao.service.SessaoService;
@@ -17,9 +18,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class SessaoController {
     private final SessaoService sessaoService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<SessaoResponse> obter(@PathVariable Long id) {
+        return ResponseEntity.ok(sessaoService.buscarPorId(id));
+    }
+
     @PostMapping
-    public ResponseEntity<SessaoResponse> criar(@RequestBody @Valid SessaoRequest request, UriComponentsBuilder uriBuilder) {
-        SessaoResponse sessaoRegistrada = sessaoService.salvar(request);
+    public ResponseEntity<SessaoCriadaResponse> criar(@RequestBody @Valid SessaoRequest request, UriComponentsBuilder uriBuilder) {
+        SessaoCriadaResponse sessaoRegistrada = sessaoService.salvar(request);
         return ResponseEntity.created(
                 uriBuilder.path("/v1/sessoes/{id}").buildAndExpand(sessaoRegistrada.id()).toUri()
         ).body(sessaoRegistrada);
