@@ -5,7 +5,6 @@ import com.assembleia.app.votacao.dto.request.VotoRequest;
 import com.assembleia.app.votacao.dto.response.SessaoCriadaResponse;
 import com.assembleia.app.votacao.dto.response.SessaoResponse;
 import com.assembleia.app.votacao.dto.response.VotoSessaoResponse;
-import com.assembleia.app.votacao.model.Sessao;
 
 public interface SessaoService {
     SessaoResponse buscarPorId(Long id);
