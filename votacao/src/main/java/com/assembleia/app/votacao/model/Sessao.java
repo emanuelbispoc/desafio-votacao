@@ -45,6 +45,13 @@ public class Sessao {
         this.pauta = pauta;
     }
 
+    public Sessao(Long id, LocalDateTime dataInicio, LocalDateTime dataFim, Pauta pauta) {
+        this.id = id;
+        this.dataInicio = dataInicio;
+        this.dataFim = dataFim;
+        this.pauta = pauta;
+    }
+
     public SessaoStatus getStatus() {
         atualizarStatus();
         return status;

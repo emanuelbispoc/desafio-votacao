@@ -34,7 +34,7 @@ public class SessaoServiceImpl implements SessaoService {
 
     @Override
     public SessaoResponse buscarPorId(Long id) {
-        return mapper.modelToSimpleResponse(verificaSeExistePorId(id));
+        return mapper.modelToSimpleResponse(verificaSeSessaoExistePorId(id));
     }
 
     @Override
@@ -56,21 +56,16 @@ public class SessaoServiceImpl implements SessaoService {
 
         sessao.adicionaVoto(new VotoSessao(request.voto(), associado));
         Sessao sessaoAtualizada = repository.save(sessao);
-        return new VotoSessaoResponse(
-                sessaoAtualizada.getId(),
-                sessaoAtualizada.getVotosSim(),
-                sessaoAtualizada.getVotosNao(),
-                sessaoAtualizada.getDataFim()
-        );
+        return mapper.toVotoResponse(sessaoAtualizada);
     }
 
-    private Sessao verificaSeExistePorId(Long id) {
+    private Sessao verificaSeSessaoExistePorId(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Sessão não encontrada."));
     }
 
     private Sessao verificaSeSessaoPodeReceberVotos(Long sessaoId, Long associadoId) {
-        Sessao sessao = verificaSeExistePorId(sessaoId);
+        Sessao sessao = verificaSeSessaoExistePorId(sessaoId);
 
         if(sessao.getStatus() != SessaoStatus.EM_ANDAMENTO) {
             throw new UnprocessableEntityException("Sessão não está em andamento.");
