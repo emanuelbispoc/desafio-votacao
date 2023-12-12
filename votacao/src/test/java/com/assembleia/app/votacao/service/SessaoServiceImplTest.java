@@ -43,6 +43,8 @@ public class SessaoServiceImplTest {
             LocalDateTime.of(2023, 1, 1, 12, 0),
             LocalDateTime.of(2023, 1, 1, 13, 0));
 
+    Associado associadoStub = AssociadoStub.criarAssociado(1L, "João L.", "01268572020");
+
     @Test
     void deveRetornarSessaoComPautaAprovada() {
         sessaoStub.setVotos(List.of(new VotoSessao(Voto.SIM, new Associado())));
@@ -81,8 +83,6 @@ public class SessaoServiceImplTest {
     void deveLancarExcecaoParaEventoEncerradoAoTentarReceberVoto() {
         sessaoStub.setVotos(List.of(new VotoSessao(Voto.NAO, new Associado())));
 
-        Associado associadoStub = AssociadoStub.criarAssociado(1L, "João L.", "01268572020");
-
         when(sessaoRepository.findById(1L))
                 .thenReturn(Optional.of(sessaoStub));
 
@@ -95,5 +95,27 @@ public class SessaoServiceImplTest {
         );
 
         assertEquals("Sessão não está em andamento.", exception.getMessage());
+    }
+
+    @Test
+    void deveLancarExcecaoAoTentarReceberVotoDuplicado() {
+        sessaoStub.setDataInicio(LocalDateTime.now());
+        sessaoStub.setDataFim(LocalDateTime.now().plusHours(1));
+
+        when(sessaoRepository.findById(1L))
+                .thenReturn(Optional.of(sessaoStub));
+
+        when(associadoService.buscarPorCpf(associadoStub.getCpf()))
+                .thenReturn(associadoStub);
+
+        when(sessaoRepository.existsByVotosIdSessaoIdAndVotosIdAssociadoId(sessaoStub.getId(), associadoStub.getId()))
+                .thenReturn(true);
+
+        VotoRequest request = new VotoRequest(associadoStub.getCpf(), Voto.SIM);
+        UnprocessableEntityException exception = assertThrows(
+                UnprocessableEntityException.class, () -> sessaoService.receberVoto(sessaoStub.getId(), request)
+        );
+
+        assertEquals("Voto já registrado.", exception.getMessage());
     }
 }
