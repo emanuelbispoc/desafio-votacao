@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -38,11 +39,12 @@ public class SessaoServiceImplTest {
     @InjectMocks
     private SessaoServiceImpl sessaoService;
 
+    Sessao sessaoStub = SessaoStub.criarSessao(
+            LocalDateTime.of(2023, 1, 1, 12, 0),
+            LocalDateTime.of(2023, 1, 1, 13, 0));
+
     @Test
     void deveRetornarSessaoComPautaAprovada() {
-        Sessao sessaoStub = SessaoStub.criarSessao(
-                LocalDateTime.of(2023, 1, 1, 12, 0),
-                LocalDateTime.of(2023, 1, 1, 13, 0));
         sessaoStub.setVotos(List.of(new VotoSessao(Voto.SIM, new Associado())));
 
         when(sessaoRepository.findById(1L))
@@ -60,9 +62,6 @@ public class SessaoServiceImplTest {
 
     @Test
     void deveRetornarSessaoComPautaReprovada() {
-        Sessao sessaoStub = SessaoStub.criarSessao(
-                LocalDateTime.of(2023, 1, 1, 12, 0),
-                LocalDateTime.of(2023, 1, 1, 13, 0));
         sessaoStub.setVotos(List.of(new VotoSessao(Voto.NAO, new Associado())));
 
         when(sessaoRepository.findById(1L))
@@ -80,10 +79,6 @@ public class SessaoServiceImplTest {
 
     @Test
     void deveLancarExcecaoParaEventoEncerradoAoTentarReceberVoto() {
-        String mensagemDeExcecaoEsperada = "Sessão não está em andamento.";
-        Sessao sessaoStub = SessaoStub.criarSessao(
-                LocalDateTime.of(2023, 1, 1, 12, 0),
-                LocalDateTime.of(2023, 1, 1, 13, 0));
         sessaoStub.setVotos(List.of(new VotoSessao(Voto.NAO, new Associado())));
 
         Associado associadoStub = AssociadoStub.criarAssociado(1L, "João L.", "01268572020");
@@ -99,6 +94,6 @@ public class SessaoServiceImplTest {
                 UnprocessableEntityException.class, () -> sessaoService.receberVoto(sessaoStub.getId(), request)
         );
 
-        assertEquals(mensagemDeExcecaoEsperada, exception.getMessage());
+        assertEquals("Sessão não está em andamento.", exception.getMessage());
     }
 }
