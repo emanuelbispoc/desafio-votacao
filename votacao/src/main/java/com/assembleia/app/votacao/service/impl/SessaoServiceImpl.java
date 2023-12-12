@@ -17,7 +17,6 @@ import com.assembleia.app.votacao.repository.SessaoRepository;
 import com.assembleia.app.votacao.service.AssociadoService;
 import com.assembleia.app.votacao.service.PautaService;
 import com.assembleia.app.votacao.service.SessaoService;
-import com.assembleia.app.votacao.service.VotoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,6 @@ import java.time.LocalDateTime;
 public class SessaoServiceImpl implements SessaoService {
     private final PautaService pautaService;
     private final AssociadoService associadoService;
-    private final VotoService votoService;
     private final SessaoRepository repository;
     private final SessaoMapper mapper;
 
@@ -76,6 +74,8 @@ public class SessaoServiceImpl implements SessaoService {
     }
 
     private void verificaSePodeReceberVotoAssociado(Long sessaoId, Long associadoId) {
-        votoService.verificaSeVotoJaExiste(sessaoId, associadoId);
+        if (repository.existsByVotosIdSessaoIdAndVotosIdAssociadoId(sessaoId, associadoId)) {
+            throw new UnprocessableEntityException("Voto já registrado.");
+        }
     }
 }
