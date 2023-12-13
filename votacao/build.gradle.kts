@@ -31,6 +31,8 @@ dependencies {
 	runtimeOnly ("org.postgresql:postgresql")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("io.rest-assured:rest-assured:5.4.0")
+
 }
 
 tasks.withType<Test> {
