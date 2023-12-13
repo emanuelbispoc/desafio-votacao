@@ -8,7 +8,7 @@ CREATE TABLE sessoes (
 );
 
 CREATE TABLE votos_sessao (
-    decisao VARCHAR(80) CHECK (decisao IN ('SIM', 'NAO')),
+    decisao VARCHAR(3) CHECK (decisao IN ('SIM', 'NAO')),
     associado_id BIGINT NOT NULL,
     sessao_id BIGINT NOT NULL,
 
