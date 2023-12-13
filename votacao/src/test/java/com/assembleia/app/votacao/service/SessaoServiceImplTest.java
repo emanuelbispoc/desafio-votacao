@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -116,6 +115,6 @@ public class SessaoServiceImplTest {
                 UnprocessableEntityException.class, () -> sessaoService.receberVoto(sessaoStub.getId(), request)
         );
 
-        assertEquals("Voto já registrado.", exception.getMessage());
+        assertEquals("O associado já registrou voto na sessão.", exception.getMessage());
     }
 }

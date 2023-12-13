@@ -75,7 +75,7 @@ public class SessaoServiceImpl implements SessaoService {
 
     private void verificaSePodeReceberVotoAssociado(Long sessaoId, Long associadoId) {
         if (repository.existsByVotosIdSessaoIdAndVotosIdAssociadoId(sessaoId, associadoId)) {
-            throw new UnprocessableEntityException("Voto já registrado.");
+            throw new UnprocessableEntityException("O associado já registrou voto na sessão.");
         }
     }
 }
