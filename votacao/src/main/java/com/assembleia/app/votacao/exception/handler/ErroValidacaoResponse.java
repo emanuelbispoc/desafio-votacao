@@ -13,7 +13,6 @@ public class ErroValidacaoResponse extends ErroResponse {
         this.campos = campos;
     }
 
-    @Getter
     public record ErroCampo(String nome, String mensagem) {
     }
 }
