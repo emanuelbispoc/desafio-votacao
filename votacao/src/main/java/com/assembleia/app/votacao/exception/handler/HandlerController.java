@@ -3,7 +3,6 @@ package com.assembleia.app.votacao.exception.handler;
 import com.assembleia.app.votacao.exception.DadoDuplicadoException;
 import com.assembleia.app.votacao.exception.NotFoundException;
 import com.assembleia.app.votacao.exception.UnprocessableEntityException;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -16,10 +15,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class HandlerController extends ResponseEntityExceptionHandler {
