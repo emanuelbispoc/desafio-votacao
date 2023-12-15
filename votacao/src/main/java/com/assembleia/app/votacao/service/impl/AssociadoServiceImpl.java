@@ -9,6 +9,7 @@ import com.assembleia.app.votacao.mapper.AssociadoMapper;
 import com.assembleia.app.votacao.model.Associado;
 import com.assembleia.app.votacao.repository.AssociadoRepository;
 import com.assembleia.app.votacao.service.AssociadoService;
+import com.assembleia.app.votacao.service.CpfService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class AssociadoServiceImpl implements AssociadoService {
     private final AssociadoRepository associadoRepository;
     private final AssociadoMapper associadoMapper;
+    private final CpfService cpfService;
 
     @Override
     public AssociadoResponse buscarPorId(Long id) {
@@ -34,6 +36,7 @@ public class AssociadoServiceImpl implements AssociadoService {
 
     @Override
     public AssociadoResponse salvar(AssociadoRequest associadoRequest) {
+        cpfService.validacao(associadoRequest.cpf());
         validarSeJaExistePorCpf(associadoRequest.cpf());
         Associado associado = associadoMapper.requestToModel(associadoRequest);
         return associadoMapper.modelToResponse(associadoRepository.save(associado));
