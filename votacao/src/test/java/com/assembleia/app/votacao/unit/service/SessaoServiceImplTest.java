@@ -1,4 +1,4 @@
-package com.assembleia.app.votacao.service;
+package com.assembleia.app.votacao.unit.service;
 
 import com.assembleia.app.votacao.dto.request.VotoRequest;
 import com.assembleia.app.votacao.dto.response.SessaoResponse;
@@ -10,6 +10,8 @@ import com.assembleia.app.votacao.model.Associado;
 import com.assembleia.app.votacao.model.Sessao;
 import com.assembleia.app.votacao.model.VotoSessao;
 import com.assembleia.app.votacao.repository.SessaoRepository;
+import com.assembleia.app.votacao.service.AssociadoService;
+import com.assembleia.app.votacao.service.CpfService;
 import com.assembleia.app.votacao.service.impl.SessaoServiceImpl;
 import com.assembleia.app.votacao.stubs.AssociadoStub;
 import com.assembleia.app.votacao.stubs.SessaoStub;
@@ -33,6 +35,8 @@ public class SessaoServiceImplTest {
     private SessaoRepository sessaoRepository;
     @Mock
     private AssociadoService associadoService;
+    @Mock
+    private CpfService cpfService;
     @Mock
     private SessaoMapper sessaoMapper;
     @InjectMocks

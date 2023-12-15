@@ -1,8 +1,10 @@
-package com.assembleia.app.votacao.controller;
+package com.assembleia.app.votacao.e2e.controller;
 
 import com.assembleia.app.votacao.dto.request.VotoRequest;
 import com.assembleia.app.votacao.enums.SessaoStatus;
 import com.assembleia.app.votacao.enums.Voto;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,8 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 
 import static com.assembleia.app.votacao.SqlProvider.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
@@ -21,6 +25,7 @@ import static org.hamcrest.Matchers.is;
         @Sql(scripts = INSERT_SESSOES, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
         @Sql(scripts = CLEAR_DATABASE, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 })
+@WireMockTest(httpPort = 8089)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SessaoControllerTest {
 
@@ -35,6 +40,15 @@ public class SessaoControllerTest {
 
     @Test
     void deveReceberVotoComSucesso() {
+        WireMock.stubFor(WireMock.get(urlEqualTo("/51682883086/situacao"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"status\":\"REGULAR\"}\n")
+
+                )
+        );
+
         given()
                 .contentType(ContentType.JSON)
                 .port(port)
@@ -56,9 +70,9 @@ public class SessaoControllerTest {
         given()
                 .contentType(ContentType.JSON)
                 .port(port)
-                .when()
+        .when()
                 .get(BASE_URL + "/2")
-                .then()
+        .then()
                 .assertThat()
                 .statusCode(200)
                 .body(
@@ -76,9 +90,9 @@ public class SessaoControllerTest {
         given()
                 .contentType(ContentType.JSON)
                 .port(port)
-                .when()
+        .when()
                 .get(BASE_URL + "/3")
-                .then()
+        .then()
                 .assertThat()
                 .statusCode(200)
                 .body(
@@ -96,10 +110,10 @@ public class SessaoControllerTest {
         given()
                 .contentType(ContentType.JSON)
                 .port(port)
-                .when()
+        .when()
                 .body(new VotoRequest("85903326323", Voto.SIM))
                 .post(BASE_URL + "/1/registra-voto")
-                .then()
+        .then()
                 .assertThat()
                 .statusCode(422)
                 .body(
@@ -112,10 +126,10 @@ public class SessaoControllerTest {
         given()
                 .contentType(ContentType.JSON)
                 .port(port)
-                .when()
+        .when()
                 .body(new VotoRequest("51682883086", Voto.SIM))
                 .post(BASE_URL + "/2/registra-voto")
-                .then()
+        .then()
                 .assertThat()
                 .statusCode(422)
                 .body(
@@ -128,14 +142,39 @@ public class SessaoControllerTest {
         given()
                 .contentType(ContentType.JSON)
                 .port(port)
-                .when()
+        .when()
                 .body(new VotoRequest("20425656870", Voto.SIM))
                 .post(BASE_URL + "/1/registra-voto")
-                .then()
+        .then()
                 .assertThat()
                 .statusCode(422)
                 .body(
                         "descricao", is("Associado não encontrado.")
+                );
+    }
+
+    @Test
+    void deveRetornarErroAoTentarReceberVotoAssociadoCpfIrregular() {
+        WireMock.stubFor(WireMock.get(urlEqualTo("/81342636074/situacao"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"status\":\"IRREGULAR\"}\n")
+
+                )
+        );
+
+        given()
+                .contentType(ContentType.JSON)
+                .port(port)
+        .when()
+                .body(new VotoRequest("81342636074", Voto.SIM))
+                .post(BASE_URL + "/1/registra-voto")
+        .then()
+                .assertThat()
+                .statusCode(422)
+                .body(
+                        "descricao", is("UNABLE_TO_VOTE")
                 );
     }
 
