@@ -8,5 +8,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface AssociadoMapper {
     AssociadoResponse modelToResponse(Associado associado);
+    Associado responseToModel(AssociadoResponse associadoResponse);
     Associado requestToModel(AssociadoRequest associadoRequest);
 }

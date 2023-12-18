@@ -1,14 +1,14 @@
 package com.assembleia.app.votacao.service.impl;
 
 import com.assembleia.app.votacao.dto.request.PautaRequest;
+import com.assembleia.app.votacao.dto.response.AssociadoResponse;
 import com.assembleia.app.votacao.dto.response.PautaResponse;
-import com.assembleia.app.votacao.exception.NotFoundException;
 import com.assembleia.app.votacao.exception.UnprocessableEntityException;
+import com.assembleia.app.votacao.mapper.AssociadoMapper;
 import com.assembleia.app.votacao.mapper.PautaMapper;
-import com.assembleia.app.votacao.model.Associado;
 import com.assembleia.app.votacao.model.Pauta;
-import com.assembleia.app.votacao.repository.AssociadoRepository;
 import com.assembleia.app.votacao.repository.PautaRepository;
+import com.assembleia.app.votacao.service.AssociadoService;
 import com.assembleia.app.votacao.service.PautaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,15 +18,16 @@ import org.springframework.stereotype.Service;
 public class PautaServiceImpl implements PautaService {
     private final PautaRepository pautaRepository;
     private final PautaMapper pautaMapper;
-    private final AssociadoRepository associadoRepository;
+    private final AssociadoMapper associadoMapper;
+    private final AssociadoService associadoService;
 
     @Override
     public PautaResponse salvar(PautaRequest pautaRequest) {
-        Associado associado = associadoRepository.findById(pautaRequest.associadoId())
-                .orElseThrow(() -> new NotFoundException("Associado não encontrado."));
+        AssociadoResponse associado = associadoService
+                .buscarPorId(pautaRequest.associadoId());
 
         Pauta pauta = pautaMapper.requestToModel(pautaRequest);
-        pauta.setRelator(associado);
+        pauta.setRelator(associadoMapper.responseToModel(associado));
 
         return pautaMapper.modelToResponse(pautaRepository.save(pauta));
     }
