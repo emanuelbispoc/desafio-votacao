@@ -36,8 +36,8 @@ public class AssociadoServiceImpl implements AssociadoService {
 
     @Override
     public AssociadoResponse salvar(AssociadoRequest associadoRequest) {
-        cpfService.validacao(associadoRequest.cpf());
         validarSeJaExistePorCpf(associadoRequest.cpf());
+        cpfService.validacao(associadoRequest.cpf());
         Associado associado = associadoMapper.requestToModel(associadoRequest);
         return associadoMapper.modelToResponse(associadoRepository.save(associado));
     }
