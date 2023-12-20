@@ -108,7 +108,7 @@ public class VotoSessao {
 }
 ````
 
-`VotoPK` é a entidade que carrega as entidades donas do id's que compõem a chave primaria 
+`VotoPK` é a entidade que carrega as entidades donas dos id's que compõem a chave primaria 
 
 ````java
 @Embeddable
