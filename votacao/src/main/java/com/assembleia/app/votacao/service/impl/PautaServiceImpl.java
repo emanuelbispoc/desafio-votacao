@@ -3,6 +3,7 @@ package com.assembleia.app.votacao.service.impl;
 import com.assembleia.app.votacao.dto.request.PautaRequest;
 import com.assembleia.app.votacao.dto.response.AssociadoResponse;
 import com.assembleia.app.votacao.dto.response.PautaResponse;
+import com.assembleia.app.votacao.exception.NotFoundException;
 import com.assembleia.app.votacao.exception.UnprocessableEntityException;
 import com.assembleia.app.votacao.mapper.AssociadoMapper;
 import com.assembleia.app.votacao.mapper.PautaMapper;
@@ -23,8 +24,13 @@ public class PautaServiceImpl implements PautaService {
 
     @Override
     public PautaResponse salvar(PautaRequest pautaRequest) {
-        AssociadoResponse associado = associadoService
-                .buscarPorId(pautaRequest.associadoId());
+        AssociadoResponse associado;
+        try{
+            associado = associadoService
+                    .buscarPorId(pautaRequest.associadoId());
+        }catch (NotFoundException e){
+            throw new UnprocessableEntityException(e.getMessage());
+        }
 
         Pauta pauta = pautaMapper.requestToModel(pautaRequest);
         pauta.setRelator(associadoMapper.responseToModel(associado));
