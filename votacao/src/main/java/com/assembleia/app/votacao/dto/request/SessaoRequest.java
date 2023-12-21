@@ -11,6 +11,6 @@ public record SessaoRequest(
 
     @Override
     public Long duracao() {
-        return duracao != null ? duracao : DURACAO_PADRAO_MIN ;
+        return duracao != null && duracao > 0 ? duracao : DURACAO_PADRAO_MIN ;
     }
 }
