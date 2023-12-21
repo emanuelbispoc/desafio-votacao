@@ -123,3 +123,4 @@ public class VotoPK {
 }
 ````
 
+Para mais informações dos endpoints acesse a URL através do navegador: http://localhost:8080/swagger-ui/index.html

@@ -1,0 +1,491 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Votação-API",
+    "description": "API para sessões de votação em assembleia",
+    "version": "V1"
+  },
+  "tags": [
+    {
+      "name": "Associado controller",
+      "description": "Controller responsável por gerenciar associados."
+    },
+    {
+      "name": "Sessão controller",
+      "description": "Controller responsável por gerenciar sessões."
+    },
+    {
+      "name": "Pauta controller",
+      "description": "Controller responsável por gerenciar pautas."
+    }
+  ],
+  "paths": {
+    "/v1/associados": {
+      "post": {
+        "tags": [
+          "Associado controller"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssociadoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Associado cadastrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociadoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroValidacaoResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "CPF inválido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/associados/{id}": {
+      "get": {
+        "tags": [
+          "Associado controller"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Associado encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociadoResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Associado não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessoes": {
+      "post": {
+        "tags": [
+          "Sessão controller"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessaoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Sessão criada.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessaoCriadaResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Id da pauta inválido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessoes/{id}/registra-voto": {
+      "post": {
+        "tags": [
+          "Sessão controller"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VotoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Voto registrado com sucesso",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VotoSessaoResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sessão não encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Voto ou CPF inválido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessoes/{id}": {
+      "get": {
+        "tags": [
+          "Sessão controller"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sessão encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessaoResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sessão não encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/pautas": {
+      "post": {
+        "tags": [
+          "Pauta controller"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PautaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Pauta criada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PautaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroValidacaoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Id de associado inválido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErroResponse": {
+        "type": "object",
+        "properties": {
+          "descricao": {
+            "type": "string"
+          },
+          "dataHora": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ErroValidacaoResponse": {
+        "type": "object",
+        "properties": {
+          "descricao": {
+            "type": "string"
+          },
+          "dataHora": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "campos": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "nome": {
+                  "type": "string"
+                },
+                "mensagem": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "AssociadoRequest": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "cpf": {
+            "type": "string",
+            "size": 11
+          }
+        }
+      },
+      "AssociadoResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "cpf": {
+            "type": "string"
+          }
+        }
+      },
+      "SessaoRequest": {
+        "type": "object",
+        "properties": {
+          "pautaId": {
+            "type": "number"
+          },
+          "duracao": {
+            "type": "number",
+            "default": 1
+          }
+        }
+      },
+      "SessaoCriadaResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "dataInicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dataFim": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "PautaResponse": {
+            "type": "object",
+            "$ref": "#/components/schemas/PautaResponse"
+          }
+        }
+      },
+      "SessaoResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "dataInicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dataFim": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "votosSim": {
+            "type": "number"
+          },
+          "votosNao": {
+            "type": "number"
+          },
+          "PautaResponse": {
+            "type": "object",
+            "$ref": "#/components/schemas/PautaResponse"
+          },
+          "SessaoStatus": {
+            "type": "string",
+            "enum": [
+              "EM_ANDAMENTO",
+              "EMPATE",
+              "PAUTA_APROVADA",
+              "PAUTA_REPROVADA"
+            ]
+          }
+        }
+      },
+      "VotoRequest": {
+        "type": "object",
+        "properties": {
+          "associadoCpf": {
+            "type": "string"
+          },
+          "Voto": {
+            "type": "string",
+            "enum": ["SIM", "NAO"]
+          }
+        }
+      },
+      "VotoSessaoResponse": {
+        "type": "object",
+        "properties": {
+          "sessaoId": {
+            "type": "number"
+          },
+          "totalVotosSim": {
+            "type": "number"
+          },
+          "totalVotosNao": {
+            "type": "number"
+          },
+          "dataTerminoSessao": {
+            "type": "date-time"
+          }
+        }
+      },
+      "PautaRequest": {
+        "type": "object",
+        "properties": {
+          "associadoId": {
+            "type": "number"
+          },
+          "descricao": {
+            "type": "string"
+          }
+        }
+      },
+      "PautaResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "descricao": {
+            "type": "string"
+          },
+          "dataCriacao": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "relatorNome": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
