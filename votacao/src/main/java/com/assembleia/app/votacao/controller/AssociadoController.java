@@ -15,9 +15,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class AssociadoController {
     private final AssociadoService associadoService;
 
-    @GetMapping("/{associadoId}")
-    public ResponseEntity<AssociadoResponse> buscar(@PathVariable Long associadoId) {
-        return ResponseEntity.ok(associadoService.buscarPorId(associadoId));
+    @GetMapping("/{id}")
+    public ResponseEntity<AssociadoResponse> buscar(@PathVariable Long id) {
+        return ResponseEntity.ok(associadoService.buscarPorId(id));
     }
 
     @PostMapping
