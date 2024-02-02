@@ -1,11 +1,12 @@
 package com.assembleia.app.votacao.model;
 
-import com.assembleia.app.votacao.enums.SessaoStatus;
-import com.assembleia.app.votacao.enums.Voto;
+import com.assembleia.app.votacao.exception.UnprocessableEntityException;
+import com.assembleia.app.votacao.model.enums.SessaoResultado;
+import com.assembleia.app.votacao.model.enums.SessaoStatus;
+import com.assembleia.app.votacao.model.enums.Voto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,7 +14,6 @@ import java.util.List;
 
 @NoArgsConstructor
 @Getter
-@Setter
 @Entity
 @Table(name = "sessoes")
 public class Sessao {
@@ -28,13 +28,6 @@ public class Sessao {
     @OneToMany(mappedBy = "id.sessao", cascade = CascadeType.ALL)
     private List<VotoSessao> votos = new ArrayList<>();
 
-    @Enumerated(EnumType.STRING)
-    private transient SessaoStatus status;
-
-    private transient long votosSim;
-
-    private transient long votosNao;
-
     @OneToOne
     @JoinColumn(name = "pauta_id")
     private Pauta pauta;
@@ -45,6 +38,14 @@ public class Sessao {
         this.pauta = pauta;
     }
 
+    public Sessao(Long id, LocalDateTime dataInicio, LocalDateTime dataFim, List<VotoSessao> votos, Pauta pauta) {
+        this.id = id;
+        this.dataInicio = dataInicio;
+        this.dataFim = dataFim;
+        this.votos = votos;
+        this.pauta = pauta;
+    }
+
     public Sessao(Long id, LocalDateTime dataInicio, LocalDateTime dataFim, Pauta pauta) {
         this.id = id;
         this.dataInicio = dataInicio;
@@ -52,41 +53,49 @@ public class Sessao {
         this.pauta = pauta;
     }
 
-    public SessaoStatus getStatus() {
-        atualizarStatus();
-        return status;
-    }
-
-    public long getVotosSim() {
-        return obterTotalVotosSim();
-    }
-
-    public long getVotosNao() {
-        return obterTotalVotosNao();
-    }
-
-    public void adicionaVoto(VotoSessao voto) {
+    public void adicionarVoto(VotoSessao voto) {
+        validarSeEstaEmAndamento();
         voto.setSessao(this);
         votos.add(voto);
     }
 
-    private long obterTotalVotosSim() {
+    public long obterTotalVotosSim() {
         return votos.stream().filter(voto -> voto.getDecisao() == Voto.SIM).count();
     }
 
-    private long obterTotalVotosNao() {
+    public long obterTotalVotosNao() {
         return votos.stream().filter(voto -> voto.getDecisao() == Voto.NAO).count();
     }
 
-    private void atualizarStatus() {
-        if(dataFim.isAfter(LocalDateTime.now())) {
-            status = SessaoStatus.EM_ANDAMENTO;
-        }else {
-            long votosSim = obterTotalVotosSim();
-            long votosNao = obterTotalVotosNao();
-
-            SessaoStatus votosVencedores = votosSim > votosNao ? SessaoStatus.PAUTA_APROVADA : SessaoStatus.PAUTA_REPROVADA;
-            status = votosSim == votosNao ? SessaoStatus.EMPATE : votosVencedores;
+    public SessaoStatus calcularStatus() {
+        if (dataFim.isAfter(LocalDateTime.now())) {
+            return SessaoStatus.EM_ANDAMENTO;
         }
+
+        return SessaoStatus.FINALIZADO;
+    }
+
+    public SessaoResultado obterResultado() {
+        if (estaEmAndamento()) {
+            return SessaoResultado.VOTACAO_EM_ANDAMENTO;
+        }
+
+        long votosSim = obterTotalVotosSim();
+        long votosNao = obterTotalVotosNao();
+
+        SessaoResultado votosVencedores = votosSim > votosNao
+                ? SessaoResultado.PAUTA_APROVADA
+                : SessaoResultado.PAUTA_REPROVADA;
+
+        return votosSim == votosNao ? SessaoResultado.EMPATE : votosVencedores;
+    }
+
+    public void validarSeEstaEmAndamento() {
+        if(!estaEmAndamento())
+            throw new UnprocessableEntityException("Sessão não está em andamento.");
+    }
+
+    private boolean estaEmAndamento() {
+        return calcularStatus() == SessaoStatus.EM_ANDAMENTO;
     }
 }
