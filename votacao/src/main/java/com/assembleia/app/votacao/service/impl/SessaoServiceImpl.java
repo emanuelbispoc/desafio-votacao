@@ -5,8 +5,6 @@ import com.assembleia.app.votacao.dto.request.VotoRequest;
 import com.assembleia.app.votacao.dto.response.SessaoCriadaResponse;
 import com.assembleia.app.votacao.dto.response.SessaoResponse;
 import com.assembleia.app.votacao.dto.response.VotoSessaoResponse;
-import com.assembleia.app.votacao.enums.SessaoStatus;
-import com.assembleia.app.votacao.enums.SituacaoCpf;
 import com.assembleia.app.votacao.exception.NotFoundException;
 import com.assembleia.app.votacao.exception.UnprocessableEntityException;
 import com.assembleia.app.votacao.mapper.SessaoMapper;
@@ -35,7 +33,7 @@ public class SessaoServiceImpl implements SessaoService {
 
     @Override
     public SessaoResponse buscarPorId(Long id) {
-        return mapper.modelToSimpleResponse(verificaSeSessaoExistePorId(id));
+        return mapper.modelToSimpleResponse(buscarSeSessaoExistePorId(id));
     }
 
     @Override
@@ -53,36 +51,30 @@ public class SessaoServiceImpl implements SessaoService {
     @Override
     public VotoSessaoResponse receberVoto(Long sessaoId, VotoRequest request) {
         Associado associado = associadoService.buscarPorCpf(request.associadoCpf());
-        Sessao sessao = verificaSeSessaoPodeReceberVotos(sessaoId, associado);
+        Sessao sessao = buscarSeSessaoExistePorId(sessaoId);
 
-        sessao.adicionaVoto(new VotoSessao(request.voto(), associado));
-        Sessao sessaoAtualizada = repository.save(sessao);
-        return mapper.toVotoResponse(sessaoAtualizada);
+        sessao.validarSeEstaEmAndamento();
+        verificarSeVotoEValido(sessao, associado);
+
+        sessao.adicionarVoto(new VotoSessao(request.voto(), associado));
+
+        return mapper.toVotoResponse(repository.save(sessao));
     }
 
-    private Sessao verificaSeSessaoExistePorId(Long id) {
+    private Sessao buscarSeSessaoExistePorId(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Sessão não encontrada."));
     }
 
-    private Sessao verificaSeSessaoPodeReceberVotos(Long sessaoId, Associado associado) {
-        Sessao sessao = verificaSeSessaoExistePorId(sessaoId);
-
-        if(sessao.getStatus() != SessaoStatus.EM_ANDAMENTO) {
-            throw new UnprocessableEntityException("Sessão não está em andamento.");
-        }
-
-        verificaSePodeReceberVotoAssociado(sessao.getId(), associado);
-        return sessao;
-    }
-
-    private void verificaSePodeReceberVotoAssociado(Long sessaoId, Associado associado) {
-        if (repository.existsByVotosIdSessaoIdAndVotosIdAssociadoId(sessaoId, associado.getId())) {
+    private void verificarSeVotoEValido(Sessao sessao, Associado associado) {
+        if (votoJaFoiRegistrado(sessao.getId(), associado.getId())) {
             throw new UnprocessableEntityException("O associado já registrou voto na sessão.");
         }
 
-        if(cpfService.verificaSituacao(associado.getCpf()).status() == SituacaoCpf.IRREGULAR) {
-            throw new UnprocessableEntityException("UNABLE_TO_VOTE");
-        }
+        cpfService.verificarSeSituacaoEstaRegular(associado.getCpf());
+    }
+
+    private boolean votoJaFoiRegistrado(Long sessaoId, Long associadoId) {
+       return repository.existsByVotosIdSessaoIdAndVotosIdAssociadoId(sessaoId, associadoId);
     }
 }
