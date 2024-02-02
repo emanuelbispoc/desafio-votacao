@@ -1,4 +1,4 @@
-package com.assembleia.app.votacao.enums;
+package com.assembleia.app.votacao.model.enums;
 
 public enum SituacaoCpf {
     REGULAR, IRREGULAR
