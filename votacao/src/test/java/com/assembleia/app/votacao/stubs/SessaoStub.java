@@ -12,7 +12,7 @@ import java.util.List;
 
 public class SessaoStub {
     public static Sessao criarSessao(LocalDateTime dataInicio, LocalDateTime dataFim) {
-        return new Sessao(1L, dataFim, dataFim, new Pauta());
+        return new Sessao(1L, dataInicio, dataFim, new Pauta());
     }
 
     public static Sessao criarSessaoComVotoPadrao(LocalDateTime dataInicio, LocalDateTime dataFim, VotoSessao voto) {
