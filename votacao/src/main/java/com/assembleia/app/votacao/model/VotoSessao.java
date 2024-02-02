@@ -1,6 +1,6 @@
 package com.assembleia.app.votacao.model;
 
-import com.assembleia.app.votacao.enums.Voto;
+import com.assembleia.app.votacao.model.enums.Voto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
