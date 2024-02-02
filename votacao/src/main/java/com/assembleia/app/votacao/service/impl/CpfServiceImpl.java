@@ -1,7 +1,6 @@
 package com.assembleia.app.votacao.service.impl;
 
 import com.assembleia.app.votacao.client.CpfClient;
-import com.assembleia.app.votacao.dto.response.CpfValidacaoResponse;
 import com.assembleia.app.votacao.exception.NotFoundException;
 import com.assembleia.app.votacao.exception.UnprocessableEntityException;
 import com.assembleia.app.votacao.model.enums.SituacaoCpf;
