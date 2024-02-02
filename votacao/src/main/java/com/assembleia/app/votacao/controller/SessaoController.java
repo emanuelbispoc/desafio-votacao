@@ -31,7 +31,7 @@ public class SessaoController {
         ).body(sessaoRegistrada);
     }
 
-    @PostMapping("/{id}/registra-voto")
+    @PostMapping("/{id}/votos")
     public ResponseEntity<VotoSessaoResponse> registraVoto(@PathVariable Long id, @RequestBody @Valid VotoRequest request) {
         return ResponseEntity.ok(sessaoService.receberVoto(id, request));
     }
