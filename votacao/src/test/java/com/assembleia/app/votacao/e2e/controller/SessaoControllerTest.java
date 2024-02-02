@@ -1,8 +1,9 @@
 package com.assembleia.app.votacao.e2e.controller;
 
 import com.assembleia.app.votacao.dto.request.VotoRequest;
-import com.assembleia.app.votacao.enums.SessaoStatus;
-import com.assembleia.app.votacao.enums.Voto;
+import com.assembleia.app.votacao.model.enums.SessaoResultado;
+import com.assembleia.app.votacao.model.enums.SessaoStatus;
+import com.assembleia.app.votacao.model.enums.Voto;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.restassured.RestAssured;
@@ -54,7 +55,7 @@ public class SessaoControllerTest {
                 .port(port)
         .when()
                 .body(new VotoRequest("51682883086", Voto.NAO))
-                .post(BASE_URL + "/1/registra-voto")
+                .post(BASE_URL + "/1/votos")
         .then()
                 .assertThat()
                 .statusCode(200)
@@ -66,7 +67,7 @@ public class SessaoControllerTest {
     }
 
     @Test
-    void deveRetornarSessaoPorIdComStatusAprovado() {
+    void deveRetornarSessaoPorIdComPautaAprovada() {
         given()
                 .contentType(ContentType.JSON)
                 .port(port)
@@ -79,14 +80,15 @@ public class SessaoControllerTest {
                         "id", is(2),
                         "votosSim", is(2),
                         "votosNao", is(1),
-                        "status",  is(SessaoStatus.PAUTA_APROVADA.toString()),
+                        "status",  is(SessaoStatus.FINALIZADO.toString()),
+                        "resultado",  is(SessaoResultado.PAUTA_APROVADA.toString()),
                         "dataInicio", is("2023-12-12T10:00:00"),
                         "dataFim", is("2023-12-12T15:00:00")
                 );
     }
 
     @Test
-    void deveRetornarSessaoPorIdComStatusReprovado() {
+    void deveRetornarSessaoPorIdPautaReprovada() {
         given()
                 .contentType(ContentType.JSON)
                 .port(port)
@@ -99,7 +101,8 @@ public class SessaoControllerTest {
                         "id", is(3),
                         "votosSim", is(1),
                         "votosNao", is(2),
-                        "status",  is(SessaoStatus.PAUTA_REPROVADA.toString()),
+                        "status",  is(SessaoStatus.FINALIZADO.toString()),
+                        "resultado",  is(SessaoResultado.PAUTA_REPROVADA.toString()),
                         "dataInicio", is("2023-12-12T14:00:00"),
                         "dataFim", is("2023-12-13T09:00:00")
                 );
@@ -112,7 +115,7 @@ public class SessaoControllerTest {
                 .port(port)
         .when()
                 .body(new VotoRequest("85903326323", Voto.SIM))
-                .post(BASE_URL + "/1/registra-voto")
+                .post(BASE_URL + "/1/votos")
         .then()
                 .assertThat()
                 .statusCode(422)
@@ -123,12 +126,21 @@ public class SessaoControllerTest {
 
     @Test
     void deveRetornarErroAoTentarReceberVotoAposEncerramento() {
+        WireMock.stubFor(WireMock.get(urlEqualTo("/51682883086/situacao"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"status\":\"REGULAR\"}\n")
+
+                )
+        );
+
         given()
                 .contentType(ContentType.JSON)
                 .port(port)
         .when()
                 .body(new VotoRequest("51682883086", Voto.SIM))
-                .post(BASE_URL + "/2/registra-voto")
+                .post(BASE_URL + "/2/votos")
         .then()
                 .assertThat()
                 .statusCode(422)
@@ -144,7 +156,7 @@ public class SessaoControllerTest {
                 .port(port)
         .when()
                 .body(new VotoRequest("20425656870", Voto.SIM))
-                .post(BASE_URL + "/1/registra-voto")
+                .post(BASE_URL + "/1/votos")
         .then()
                 .assertThat()
                 .statusCode(422)
@@ -169,7 +181,7 @@ public class SessaoControllerTest {
                 .port(port)
         .when()
                 .body(new VotoRequest("81342636074", Voto.SIM))
-                .post(BASE_URL + "/1/registra-voto")
+                .post(BASE_URL + "/1/votos")
         .then()
                 .assertThat()
                 .statusCode(422)

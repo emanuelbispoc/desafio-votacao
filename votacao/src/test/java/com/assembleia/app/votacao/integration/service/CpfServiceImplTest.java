@@ -1,8 +1,7 @@
 package com.assembleia.app.votacao.integration.service;
 
-import com.assembleia.app.votacao.dto.response.CpfValidacaoResponse;
-import com.assembleia.app.votacao.enums.SituacaoCpf;
 import com.assembleia.app.votacao.exception.NotFoundException;
+import com.assembleia.app.votacao.exception.UnprocessableEntityException;
 import com.assembleia.app.votacao.service.impl.CpfServiceImpl;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
@@ -30,7 +29,7 @@ public class CpfServiceImplTest {
                 )
         );
 
-        assertDoesNotThrow(()-> cpfService.validacao("72694294057"));
+        assertDoesNotThrow(()-> cpfService.verificarSeCpfExiste("72694294057"));
     }
 
     @Test
@@ -44,14 +43,14 @@ public class CpfServiceImplTest {
         );
 
         NotFoundException exception = assertThrows(
-                NotFoundException.class, () -> cpfService.validacao("52541628056")
+                NotFoundException.class, () -> cpfService.verificarSeCpfExiste("52541628056")
         );
 
         assertEquals("CPF inválido", exception.getMessage());
     }
 
     @Test
-    void deveRetornarSituacaoIrregularCorretamente() {
+    void deveLancarExcecaoParaCpfComSitucaoIrregular() {
         WireMock.stubFor(WireMock.get(urlEqualTo("/97076518066/situacao"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -61,22 +60,24 @@ public class CpfServiceImplTest {
                 )
         );
 
-        CpfValidacaoResponse cpfValidacaoResponse = cpfService.verificaSituacao("97076518066");
-        assertEquals(SituacaoCpf.IRREGULAR, cpfValidacaoResponse.status());
+        UnprocessableEntityException exception = assertThrows(
+                UnprocessableEntityException.class, () -> cpfService.verificarSeSituacaoEstaRegular("97076518066")
+        );
+
+        assertEquals("UNABLE_TO_VOTE", exception.getMessage());
     }
 
     @Test
-    void deveRetornarSituacaoRegularCorretamente() {
+    void deveValidarCpfComSituacaoRegularCorretamente() {
         WireMock.stubFor(WireMock.get(urlEqualTo("/35460280079/situacao"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("{\"status\":\"IRREGULAR\"}\n")
+                        .withBody("{\"status\":\"REGULAR\"}\n")
 
                 )
         );
 
-        CpfValidacaoResponse cpfValidacaoResponse = cpfService.verificaSituacao("35460280079");
-        assertEquals(SituacaoCpf.IRREGULAR, cpfValidacaoResponse.status());
+        assertDoesNotThrow(()-> cpfService.verificarSeSituacaoEstaRegular("35460280079"));
     }
 }

@@ -48,7 +48,7 @@ public class AssociadoServiceImplTest {
 
         assertEquals(1L, associadoSalvo.id());
         assertEquals("28013225984", associadoSalvo.cpf());
-        verify(cpfService, times(1)).validacao(request.cpf());
+        verify(cpfService, times(1)).verificarSeCpfExiste(request.cpf());
     }
 
     @Test
@@ -65,13 +65,13 @@ public class AssociadoServiceImplTest {
     @Test
     void deveLancarExcecaoParaCpfInvalido() {
         when(associadoRepository.existsByCpf(request.cpf())).thenReturn(false);
-        doThrow(new NotFoundException("CPF inválido")).when(cpfService).validacao(request.cpf());
+        doThrow(new NotFoundException("CPF inválido")).when(cpfService).verificarSeCpfExiste(request.cpf());
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class, () -> associadoService.salvar(request)
         );
 
         assertEquals("CPF inválido", exception.getMessage());
-        verify(cpfService, times(1)).validacao(request.cpf());
+        verify(cpfService, times(1)).verificarSeCpfExiste(request.cpf());
     }
 }

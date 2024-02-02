@@ -2,8 +2,9 @@ package com.assembleia.app.votacao.unit.service;
 
 import com.assembleia.app.votacao.dto.request.VotoRequest;
 import com.assembleia.app.votacao.dto.response.SessaoResponse;
-import com.assembleia.app.votacao.enums.SessaoStatus;
-import com.assembleia.app.votacao.enums.Voto;
+import com.assembleia.app.votacao.model.enums.SessaoResultado;
+import com.assembleia.app.votacao.model.enums.SessaoStatus;
+import com.assembleia.app.votacao.model.enums.Voto;
 import com.assembleia.app.votacao.exception.UnprocessableEntityException;
 import com.assembleia.app.votacao.mapper.SessaoMapper;
 import com.assembleia.app.votacao.model.Associado;
@@ -42,15 +43,15 @@ public class SessaoServiceImplTest {
     @InjectMocks
     private SessaoServiceImpl sessaoService;
 
-    Sessao sessaoStub = SessaoStub.criarSessao(
-            LocalDateTime.of(2023, 1, 1, 12, 0),
-            LocalDateTime.of(2023, 1, 1, 13, 0));
-
     Associado associadoStub = AssociadoStub.criarAssociado(1L, "João L.", "01268572020");
 
     @Test
     void deveRetornarSessaoComPautaAprovada() {
-        sessaoStub.setVotos(List.of(new VotoSessao(Voto.SIM, new Associado())));
+        Sessao sessaoStub = SessaoStub.criarSessaoComVotoPadrao(
+                LocalDateTime.of(2023, 1, 1, 12, 0),
+                LocalDateTime.of(2023, 1, 1, 13, 0),
+                new VotoSessao(Voto.SIM, new Associado())
+        );
 
         when(sessaoRepository.findById(1L))
                 .thenReturn(Optional.of(sessaoStub));
@@ -60,14 +61,19 @@ public class SessaoServiceImplTest {
 
         SessaoResponse sessaoResponse = sessaoService.buscarPorId(1L);
 
-        assertEquals(SessaoStatus.PAUTA_APROVADA, sessaoResponse.status());
+        assertEquals(SessaoResultado.PAUTA_APROVADA, sessaoResponse.resultado());
+        assertEquals(SessaoStatus.FINALIZADO, sessaoResponse.status());
         assertEquals(1L, sessaoResponse.votosSim());
         assertEquals(0L, sessaoResponse.votosNao());
     }
 
     @Test
     void deveRetornarSessaoComPautaReprovada() {
-        sessaoStub.setVotos(List.of(new VotoSessao(Voto.NAO, new Associado())));
+        Sessao sessaoStub = SessaoStub.criarSessaoComVotoPadrao(
+                LocalDateTime.of(2023, 1, 1, 12, 0),
+                LocalDateTime.of(2023, 1, 1, 13, 0),
+                new VotoSessao(Voto.NAO, new Associado())
+        );
 
         when(sessaoRepository.findById(1L))
                 .thenReturn(Optional.of(sessaoStub));
@@ -77,14 +83,19 @@ public class SessaoServiceImplTest {
 
         SessaoResponse sessaoResponse = sessaoService.buscarPorId(1L);
 
-        assertEquals(SessaoStatus.PAUTA_REPROVADA, sessaoResponse.status());
+        assertEquals(SessaoResultado.PAUTA_REPROVADA, sessaoResponse.resultado());
+        assertEquals(SessaoStatus.FINALIZADO, sessaoResponse.status());
         assertEquals(0L, sessaoResponse.votosSim());
         assertEquals(1L, sessaoResponse.votosNao());
     }
 
     @Test
     void deveLancarExcecaoParaEventoEncerradoAoTentarReceberVoto() {
-        sessaoStub.setVotos(List.of(new VotoSessao(Voto.NAO, new Associado())));
+        Sessao sessaoStub = SessaoStub.criarSessaoComVotoPadrao(
+                LocalDateTime.of(2023, 1, 1, 12, 0),
+                LocalDateTime.of(2023, 1, 1, 13, 0),
+                new VotoSessao(Voto.NAO, new Associado())
+        );
 
         when(sessaoRepository.findById(1L))
                 .thenReturn(Optional.of(sessaoStub));
@@ -102,8 +113,10 @@ public class SessaoServiceImplTest {
 
     @Test
     void deveLancarExcecaoAoTentarReceberVotoDuplicado() {
-        sessaoStub.setDataInicio(LocalDateTime.now());
-        sessaoStub.setDataFim(LocalDateTime.now().plusHours(1));
+        Sessao sessaoStub = SessaoStub.criarSessao(
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1)
+        );
 
         when(sessaoRepository.findById(1L))
                 .thenReturn(Optional.of(sessaoStub));
