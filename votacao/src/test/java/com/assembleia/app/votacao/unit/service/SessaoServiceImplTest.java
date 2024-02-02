@@ -2,14 +2,14 @@ package com.assembleia.app.votacao.unit.service;
 
 import com.assembleia.app.votacao.dto.request.VotoRequest;
 import com.assembleia.app.votacao.dto.response.SessaoResponse;
-import com.assembleia.app.votacao.model.enums.SessaoResultado;
-import com.assembleia.app.votacao.model.enums.SessaoStatus;
-import com.assembleia.app.votacao.model.enums.Voto;
 import com.assembleia.app.votacao.exception.UnprocessableEntityException;
 import com.assembleia.app.votacao.mapper.SessaoMapper;
 import com.assembleia.app.votacao.model.Associado;
 import com.assembleia.app.votacao.model.Sessao;
 import com.assembleia.app.votacao.model.VotoSessao;
+import com.assembleia.app.votacao.model.enums.SessaoResultado;
+import com.assembleia.app.votacao.model.enums.SessaoStatus;
+import com.assembleia.app.votacao.model.enums.Voto;
 import com.assembleia.app.votacao.repository.SessaoRepository;
 import com.assembleia.app.votacao.service.AssociadoService;
 import com.assembleia.app.votacao.service.CpfService;
@@ -23,7 +23,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
