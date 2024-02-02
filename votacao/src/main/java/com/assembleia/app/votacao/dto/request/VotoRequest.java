@@ -1,6 +1,6 @@
 package com.assembleia.app.votacao.dto.request;
 
-import com.assembleia.app.votacao.enums.Voto;
+import com.assembleia.app.votacao.model.enums.Voto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
